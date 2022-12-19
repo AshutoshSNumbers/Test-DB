@@ -3,6 +3,8 @@ package com.test.testdb.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,28 +30,28 @@ public class ProductController {
     }
 
     @GetMapping(value = "/products")
-    public List<Product> getProducts() {
-        return prodService.getAllProducts();
+    public ResponseEntity<?> getProducts() {
+        return new ResponseEntity<List<Product>>(prodService.getAllProducts(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/product:{productId}")
-    public Product getProductById(@PathVariable("productId") Long productId) {
-        return prodService.getProductsById(productId);
+    public ResponseEntity<?>  getProductById(@PathVariable("productId") Long productId) {
+        return new ResponseEntity<Product>(prodService.getProductById(productId), HttpStatus.OK);
     }
 
     @PostMapping(value = "/product")
-    public String addProduct(@RequestBody Product product){
-        return prodService.addProduct(product);
+    public ResponseEntity<?>  addProduct(@RequestBody Product product){
+        return new ResponseEntity<Product>(prodService.addProduct(product), HttpStatus.OK);
     }
 
     @PutMapping(value = "/product")
-    public String updateProduct(@RequestBody Product product){
-        return prodService.updateProduct(product);
+    public ResponseEntity<?>  updateProduct(@RequestBody Product product){
+        return new ResponseEntity<Product>(prodService.updateProduct(product), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/product:{productId}")
-    public String deleteProduct(@PathVariable("productId") Long productId){
-        return prodService.deleteProduct(productId);
+    public ResponseEntity<?>  deleteProduct(@PathVariable("productId") Long productId){
+        return new ResponseEntity<Product>(prodService.deleteProduct(productId), HttpStatus.OK);
     }
 
 }

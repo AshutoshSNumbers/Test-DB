@@ -2,8 +2,10 @@ package com.test.testdb.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import com.test.testdb.exceptions.FailedDBMethodException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,56 +13,50 @@ import com.test.testdb.model.Product;
 import com.test.testdb.repositories.ProductRepository;
 
 @Service
-public class ProductService {
+public class ProductService implements IProductService{
 
     @Autowired
     ProductRepository prodRepo;
     
     public List<Product> getAllProducts(){
-       try{
-           return prodRepo.findAll();
-       }catch(Exception e){
-           return new ArrayList<>();
-       }
+        return prodRepo.findAll();
     }
 
-    public Product getProductsById(Long productId){
-        try{
-            List<Product> products = prodRepo.findByProductId(productId);
-                return products.get(0);
-
-        }catch(Exception e){
-            return new Product();
+    public Product getProductById(Long productId) {
+        Product product = prodRepo.findByProductId(productId);
+        if(product != null){
+            return product;
         }
+        throw new NoSuchElementException();
+
     }
 
-    public String addProduct(Product product){
+    public Product addProduct(Product product){
         try{
             prodRepo.insert(product);
-            return "Successfully added product : " + String.valueOf(product);
+            return product;
         }catch(Exception e){
-            return "Unable to add the product with productId : " + String.valueOf(product) ;
+            throw new FailedDBMethodException();
         }
     }
 
-    public String deleteProduct(Long productId){
+    public Product deleteProduct(Long productId){
+        Product product = this.getProductById(productId);
+        prodRepo.delete(product);
         try{
-            List<Product> products = prodRepo.findByProductId(productId);
-            if(products.size() > 0){
-                prodRepo.delete(products.get(0));
-            }
-            return "Deleted product : " + products.get(0).toString();
+            prodRepo.delete(product);
+            return product;
         }catch(Exception e){
-            return "Unable to delete the product with productId : " + productId;
+            throw new FailedDBMethodException();
         }
     }
 
-    public String updateProduct(Product product){
+    public Product updateProduct(Product product){
         try{
             Product prod= prodRepo.save(product);
-            return "Product updated : " + String.valueOf(prod);
+            return prod;
         }catch(Exception e){
-            return "Unable to update the product : " + String.valueOf(product);
+            throw new FailedDBMethodException();
         }
     }
 
